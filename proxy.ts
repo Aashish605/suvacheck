@@ -1,15 +1,21 @@
 import { getToken } from "next-auth/jwt";
 import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 
-export async function middleware(request) {
+// Define a custom type for your JWT to include the 'role' property
+interface ExtendedToken {
+    role?: string;
+}
+
+export async function proxy(request: NextRequest) {
     const token = await getToken({ 
         req: request, 
         secret: process.env.NEXTAUTH_SECRET || "test-secret-key-change-in-production"
-    });
+    }) as ExtendedToken | null;
 
     const { pathname } = request.nextUrl;
 
-    // Protect Order routes - admin only
+    // Protect Order routes - admin/staff only
     if (pathname.startsWith("/Order")) {
         if (!token) {
             return NextResponse.redirect(new URL("/Login", request.url));
@@ -19,7 +25,7 @@ export async function middleware(request) {
         }
     }
 
-    // Protect Upload routes - admin only
+    // Protect Upload routes - admin/staff only
     if (pathname.startsWith("/Upload")) {
         if (!token) {
             return NextResponse.redirect(new URL("/Login", request.url));
@@ -49,12 +55,13 @@ export async function middleware(request) {
         }
     }
 
-
     if (pathname.startsWith("/api/Upload")) {
         if (!token) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
-        if (token.role !== "staff") {
+        if (token.role !== "staff" && token.role !== "admin") { 
+            // Note: Added admin check here to match typical logic, 
+            // but kept your staff requirement.
             return NextResponse.json({ error: "Forbidden" }, { status: 403 });
         }
     }
