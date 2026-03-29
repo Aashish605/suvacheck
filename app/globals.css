@@ -1,0 +1,14 @@
+@import "tailwindcss";
+
+
+
+@theme {
+  --color-secondary: #eb1d28;
+  --color-primary: #202469;
+  --text-create: 1.1rem;
+  --font-poppins: var(--font-poppins);
+}
+
+body {
+  font-family: var(--font-poppins);
+}
