@@ -1,6 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  /* config options here */
-};
-
+  experimental: {
+    ppr: false, // Ensure this is false until you update
+  },
+}
 export default nextConfig;
